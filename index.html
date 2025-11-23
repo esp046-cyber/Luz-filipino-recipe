@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Luz Filipino Recipes - Authentic Filipino Cuisine</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Luz's collection of authentic Traditional Filipino Recipes - Your complete guide to genuine Filipino cuisine">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Filipino Recipes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Filipino Recipes">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons for different platforms -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-72x72.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-152x152.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('🎌 PWA: Service Worker registered successfully', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New content is available, prompt user to refresh
+                                    if (confirm('🎌 New Filipino recipes available! Refresh to update?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('🎌 PWA: Service Worker registration failed', error);
+                    });
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Luz Filipino Recipes</h1>
+            <p class="hero-subtitle">Your complete collection of traditional Filipino dishes - now with offline access!</p>
+            <div class="search-container">
+                <div class="search-bar">
+                    <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search recipes...">
+                </div>
+            </div>
+            <div class="filter-pills">
+                <button class="filter-pill active" data-category="all">All</button>
+                <button class="filter-pill" data-category="main">Main Dish</button>
+                <button class="filter-pill" data-category="appetizer">Appetizer</button>
+                <button class="filter-pill" data-category="dessert">Dessert</button>
+                <button class="filter-pill" data-category="beverage">Beverage</button>
+                <button class="filter-pill" data-category="snack">Snack</button>
+            </div>
+            
+            <!-- PWA Install Prompt -->
+            <div id="pwaInstallPrompt" class="pwa-install-prompt" style="display: none;">
+                <div class="pwa-install-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7,10 12,15 17,10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Install for offline access</span>
+                    <button id="installBtn" class="pwa-install-btn">Install</button>
+                    <button id="dismissBtn" class="pwa-dismiss-btn">×</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recipe Grid -->
+    <main class="main-content">
+        <div class="container">
+            <div class="recipe-stats">
+                <span id="recipeCount">200</span> Traditional Filipino Recipes
+            </div>
+            <div class="recipe-grid" id="recipeGrid">
+                <!-- Recipe cards will be dynamically generated -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Recipe Detail Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="modal-header">
+                <img class="modal-image" id="modalImage" src="" alt="">
+                <div class="modal-title-section">
+                    <h2 class="modal-title" id="modalTitle"></h2>
+                    <div class="modal-meta" id="modalMeta"></div>
+                    <div class="modal-tags" id="modalTags"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-ingredients">
+                    <h3>Ingredients</h3>
+                    <ul id="modalIngredients"></ul>
+                </div>
+                <div class="modal-instructions">
+                    <h3>Instructions</h3>
+                    <ol id="modalInstructions"></ol>
+                </div>
+                <div class="modal-nutrition" id="modalNutrition"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
